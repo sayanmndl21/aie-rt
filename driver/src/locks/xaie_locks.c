@@ -110,39 +110,45 @@ AieRC XAie_LockAcquire(XAie_DevInst *DevInst, XAie_LocType Loc, XAie_Lock Lock,
 * @note 	None.
 *
 ******************************************************************************/
-AieRC XAie_LockRelease(XAie_DevInst *DevInst, XAie_LocType Loc, XAie_Lock Lock,
-		u32 TimeOut)
-{
-	u8  TileType;
-	const XAie_LockMod *LockMod;
+AieRC XAie_LockRelease(XAie_DevInst *DevInst, XAie_LocType Loc, XAie_Lock Lock, u32 TimeOut) {
+    if (DevInst == NULL || DevInst->IsReady != XAIE_COMPONENT_IS_READY) {
+        XAIE_ERROR("Invalid Device Instance or Component not ready\n");
+        return XAIE_INVALID_ARGS;
+    }
 
-	if((DevInst == XAIE_NULL) ||
-			(DevInst->IsReady != XAIE_COMPONENT_IS_READY)) {
-		XAIE_ERROR("Invalid Device Instance\n");
-		return XAIE_INVALID_ARGS;
-	}
+    u8 TileType = DevInst->DevOps->GetTTypefromLoc(DevInst, Loc);
+    if (TileType == XAIEGBL_TILE_TYPE_SHIMPL) {
+        XAIE_ERROR("Invalid Tile Type\n");
+        return XAIE_INVALID_TILE;
+    }
 
-	TileType = DevInst->DevOps->GetTTypefromLoc(DevInst, Loc);
-	if(TileType == XAIEGBL_TILE_TYPE_SHIMPL) {
-		XAIE_ERROR("Invalid Tile Type\n");
-		return XAIE_INVALID_TILE;
-	}
+    const XAie_LockMod *LockMod = DevInst->DevProp.DevMod[TileType].LockMod;
 
-	LockMod = DevInst->DevProp.DevMod[TileType].LockMod;
+    if (Lock.LockId >= LockMod->NumLocks) {
+        XAIE_ERROR("Invalid Lock Id\n");
+        return XAIE_INVALID_LOCK_ID;
+    }
 
-	if(Lock.LockId > LockMod->NumLocks) {
-		XAIE_ERROR("Invalid Lock Id\n");
-		return XAIE_INVALID_LOCK_ID;
-	}
+    if (Lock.LockVal < LockMod->LockValLowerBound || Lock.LockVal > LockMod->LockValUpperBound) {
+        XAIE_ERROR("Lock value out of range\n");
+        return XAIE_INVALID_LOCK_VALUE;
+    }
 
-	if((Lock.LockVal > LockMod->LockValUpperBound) ||
-			(Lock.LockVal < LockMod->LockValLowerBound)) {
-		XAIE_ERROR("Lock value out of range\n");
-		return XAIE_INVALID_LOCK_VALUE;
-	}
+    // Added log for releasing the lock
+    XAIE_INFO("Releasing lock: LockId=%d, LockVal=%d, TimeOut=%d\n", Lock.LockId, Lock.LockVal, TimeOut);
 
-	return LockMod->Release(DevInst, LockMod, Loc, Lock, TimeOut);
+    AieRC RC = LockMod->Release(DevInst, LockMod, Loc, Lock, TimeOut);
+    if (RC != XAIE_OK) {
+        XAIE_ERROR("Failed to release lock\n");
+        return RC;
+    }
+
+    // Added success log
+    XAIE_DEBUG("Lock released successfully\n");
+
+    return XAIE_OK;
 }
+
 
 /*****************************************************************************/
 /**
