@@ -370,7 +370,7 @@ static AieRC _XAie_SimIO_NpiMaskPoll(void *IOInst, u64 RegOff, u32 Mask,
 		XAie_SimIO_NpiRead32(IOInst, RegOff, &RegVal);
 		if((RegVal & Mask) == Value) {
 			Ret = XAIE_OK;
-			break;
+			return Ret;
 		}
 		usleep(1);
 		TimeOutUs--;

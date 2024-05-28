@@ -280,6 +280,10 @@ AieRC XAie_PartitionTeardown(XAie_DevInst *DevInst)
 		return RC;
 	}
 
+	XAIE_INFO("Partition teardown started.\n");
+	DevInst->IsReady = XAIE_COMPONENT_NOT_READY;
+	XAIE_DEBUG("Partition teardown successful.\n");
+	
 	return XAIE_OK;
 }
 
