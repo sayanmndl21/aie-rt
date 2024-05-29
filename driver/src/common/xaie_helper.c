@@ -530,9 +530,9 @@ static int TxnCmdDump(XAie_TxnCmd* cmd) {
 ******************************************************************************/
 static AieRC _XAie_ReallocCmdBuf(XAie_TxnInst *TxnInst)
 {
-	TxnInst->CmdBuf = (XAie_TxnCmd *)realloc((void *)TxnInst->CmdBuf,
-			sizeof(XAie_TxnCmd) *
-			(TxnInst->MaxCmds + XAIE_DEFAULT_NUM_CMDS));
+	TxnInst->CmdBuf = (XAie_TxnCmd *)realloc((void *)TxnInst->CmdBuf, 
+			sizeof(XAie_TxnCmd) * 
+			(TxnInst->MaxCmds + XAIE_DEFAULT_NUM_CMDS)); 
 	if(TxnInst->CmdBuf == NULL) {
 		XAIE_ERROR("Failed reallocate memory for transaction buffer "
 				"with id: %d\n", TxnInst->Tid);
@@ -1625,11 +1625,11 @@ AieRC XAie_RunOp(XAie_DevInst *DevInst, XAie_BackendOpCode Op, void *Arg)
 								(u64)(uintptr_t)Buf;
 				TxnInst->NumCmds++;
 			} else {
-				for(u8 i = 0; i < BdArgs->NumBdWords; i++) {
-					XAie_Write32(DevInst,
-							BdArgs->Addr + i * 4,
-							BdArgs->BdWords[i]);
-				}
+				for(u8 i = 0; i < BdArgs->NumBdWords; i++) { 
+					XAie_Write32(DevInst, 
+							BdArgs->Addr + i * 4, 
+							BdArgs->BdWords[i]); 
+				} 
 			}
 			return XAIE_OK;
 		} else {
