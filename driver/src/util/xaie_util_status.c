@@ -194,39 +194,38 @@ static void _XAie_ToString(char str[], int num)
 * @note         None.
 *
 ******************************************************************************/
-int XAie_CoreStatus_CSV(u32 Reg, char *Buf) {
-
-    int CharsWritten = 0;        // characters written
-    u8  Shift 	= 0;
-    u32 Val 	= 0;
-    u32 TempReg = Reg;
-
-    if( (TempReg & 0x01) ) // if bit 0 is set then Enabled state.
-        CharsWritten += _XAie_strcpy(&Buf[CharsWritten], XAie_CoreStatus_Strings[Shift], TRUE);
-
-    Shift++;
-    TempReg     = TempReg >> 1;
-    Val = TempReg & 0x01;
-    if(Val) // if bit 1 is set then Reset state.
-        CharsWritten += _XAie_strcpy(&Buf[CharsWritten], XAie_CoreStatus_Strings[Shift], TRUE);
-
-    if(!((Reg&0x01) || (Reg&0x02))) // if neither bit 0 nor bit  1 is set, Disabled is output.
-        CharsWritten += _XAie_strcpy(&Buf[CharsWritten], "Disabled", TRUE);
-
-    TempReg     = TempReg >> 1;
-
-    while(TempReg!=0){
-	Shift++;
-	Val 	= TempReg & 0x1;
-	if (Val){
-            CharsWritten += _XAie_strcpy(&Buf[CharsWritten], XAie_CoreStatus_Strings[Shift], TRUE);
-	}
-	TempReg >>= 1;
+int XAie_CoreStatus_CSV(u32 Reg, char *Buf){
+    int CharsWritten =  0;        // characters written
+    u8 Shift = 0;
+    u32 Val = 0;
+    u32 TempReg =  Reg;
+    if (TempReg & 0x01) { // if bit 0 is set then Enabled state.
+        CharsWritten +=  _XAie_strcpy(&Buf[CharsWritten], XAie_CoreStatus_Strings[Shift], TRUE);
     }
-    CharsWritten--;   // The last call added a comma , which is not needed at the end.
-    Buf[CharsWritten]='\0';
-    return CharsWritten;
-}
+    Shift++; 
+    TempReg =  TempReg >> 1;
+    Val =  TempReg & 0x01;
+    if (Val) { // if bit 1 is set then Reset state.
+        CharsWritten +=  _XAie_strcpy(&Buf[CharsWritten], XAie_CoreStatus_Strings[Shift], TRUE);
+    }
+    if (!((Reg & 0x01) || (Reg & 0x02))) { // if neither bit 0 nor bit 1 is set, Disabled is output.
+        CharsWritten +=  _XAie_strcpy(&Buf[CharsWritten], "Disabled", TRUE);
+    }
+    TempReg = TempReg >> 1;
+    while (TempReg != 0) {
+        Shift++; 
+        Val = TempReg & 0x1; 
+        if (Val) { 
+            CharsWritten +=  _XAie_strcpy(&Buf[CharsWritten], XAie_CoreStatus_Strings[Shift], TRUE);
+        } 
+        TempReg >>= 1; 
+     }
+
+    CharsWritten--;  // The last call added a comma , which is not needed at the end.
+    Buf[CharsWritten] = '\0';
+    return  CharsWritten;
+} 
+
 
 /*****************************************************************************/
 /**
